@@ -31,9 +31,17 @@ class MainInterface(QMainWindow, Ui_MainWindow):
             self.lv_dataset.addItem(name[1])
 
         self.btn_query_play.clicked.connect(self.play)
+        self.btn_query_play.setEnabled(False)
         self.hs_query_progress.setRange(0, 0)
         self.hs_query_progress.sliderMoved.connect(self.setPosition)
         self.btn_query_process.clicked.connect(self.openFile)
+
+
+        self.btn_dataset_play.clicked.connect(self.dateset_play)
+        self.btn_dataset_play.setEnabled(False)
+        self.lv_dataset.currentItemChanged.connect(self.dataset_list_item_clicked)
+        self.hs_dataset_progress.setRange(0,0)
+        self.hs_dataset_progress.sliderMoved.connect(self.dataset_setPosition)
 
     def findQueryFiles(self):
         query_name_list = []
@@ -64,8 +72,17 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         else:
             self.mediaPlayer.play()
 
+    def dateset_play(self):
+        if self.dataset_mediaPlayer.state() == QMediaPlayer.PlayingState:
+            self.dataset_mediaPlayer.pause()
+        else:
+            self.dataset_mediaPlayer.play()
+
     def setPosition(self, position):
         self.mediaPlayer.setPosition(position)
+
+    def dataset_setPosition(self, position):
+        self.dataset_mediaPlayer.setPosition(position)
 
     def openFile(self):
 
@@ -100,6 +117,47 @@ class MainInterface(QMainWindow, Ui_MainWindow):
     def handleError(self):
         self.btn_query_play.setEnabled(False)
         # self.errorLabel.setText("Error: " + self.mediaPlayer.errorString())
+
+    def dataset_mediaStateChanged(self, state):
+        if self.dataset_mediaPlayer.state() == QMediaPlayer.PlayingState:
+            self.btn_dataset_play.setIcon(
+                self.style().standardIcon(QStyle.SP_MediaPause))
+        else:
+            self.btn_dataset_play.setIcon(
+                self.style().standardIcon(QStyle.SP_MediaPlay))
+
+    def dataset_positionChanged(self, position):
+        self.hs_dataset_progress.setValue(position)
+
+    def dataset_durationChanged(self, duration):
+        self.hs_dataset_progress.setRange(0, duration)
+
+    def dataset_setPosition(self, position):
+        self.dataset_mediaPlayer.setPosition(position)
+
+    def dataset_handleError(self):
+        self.btn_dataset_play.setEnabled(False)
+        # self.errorLabel.setText("Error: " + self.mediaPlayer.errorString())
+
+
+
+    def dataset_list_item_clicked(self,current):
+        videoFileName = current.text() + "_output.mov"
+        videoFilePath = os.getcwd()+"/" + videoFileName
+        if not os.path.isfile(videoFilePath):
+            video = play.VideoGenerator()
+            video.generateVideo(dataset_path+current.text()+"/",current.text())
+        self.dataset_mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self.dataset_mediaPlayer.setVideoOutput(self.videoWidget_2)
+        self.dataset_mediaPlayer.stateChanged.connect(self.dataset_mediaStateChanged)
+        self.dataset_mediaPlayer.positionChanged.connect(self.dataset_positionChanged)
+        self.dataset_mediaPlayer.durationChanged.connect(self.dataset_durationChanged)
+        self.dataset_mediaPlayer.error.connect(self.dataset_handleError)
+
+        self.dataset_mediaPlayer.setMedia(
+            QMediaContent(QUrl.fromLocalFile(videoFilePath)))
+        self.btn_dataset_play.setEnabled(True)
+
 
 
 if __name__ == '__main__':
