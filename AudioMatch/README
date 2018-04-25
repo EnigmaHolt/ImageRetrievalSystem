@@ -2,7 +2,7 @@ For AudioAnalysis, you need to install pyAudioAnalysis:
                    pip2 install pyAudioAnalysis
 go to https://github.com/tyiannak/pyAudioAnalysis/wiki for more information
 **************************************************************************
-createJSON.py used to creat feature data offline
+createJSON.py is used to create feature data offline
 I put all audio together, only need to change the path in the beginning
 
 I also upload the json file which is used to compare online
