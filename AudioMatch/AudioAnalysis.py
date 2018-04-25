@@ -101,6 +101,8 @@ def calParams(path):
     stdE = np.std(features[1])
     return[mF, th, meanZRC, stdZRC, meanE, stdE]
 
+
+
 #calculate diffenrent with the video in databases
 def compareSimilarity(queryPath):
     #load DBdatas from json file
@@ -123,6 +125,7 @@ def compareSimilarity(queryPath):
         totalD = thW*thDiff + meanEDiff*meanEW + meanZDiff*meanZCRW + stdEDiff*stdEW + stdZDiff*stdZCRW + mfW * freqDiff
         cur.diff = totalD
         different.append(cur)
+    different.sort(cmp=None, key=lambda x:x.diff, reverse=False)
     return different
 
 
