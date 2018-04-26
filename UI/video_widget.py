@@ -88,12 +88,14 @@ class VideoPlayer(QWidget):
 
 if __name__ == '__main__':
 
-    import sys
+    import sys,os
 
     app = QApplication(sys.argv)
 
     player = VideoPlayer()
     player.resize(320, 240)
     player.show()
+
+    os.system("python /Users/haowu/Documents/python_workspace/AudioRetrivalSystem/AudioMatch/AudioAnalysis.py")
 
     sys.exit(app.exec_())

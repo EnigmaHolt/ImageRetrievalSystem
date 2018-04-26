@@ -129,10 +129,12 @@ def compareSimilarity(queryPath):
     return different
 
 
-
-
 if __name__ == "__main__":
     #used to test
-    diff = compareSimilarity("Q5.wav")
+    diff = compareSimilarity("/Users/haowu/Documents/576/project/query/first/first.wav")
+
+    f = open('/Users/haowu/Documents/576/project/test.txt', 'w')
+
     for d in diff:
-        print d.name, " : ", d.diff
+        f.write(d.name+ " : "+str(d.diff))
+    f.close()

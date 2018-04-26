@@ -1,3 +1,4 @@
+
 import sys
 import os
 import play
@@ -8,9 +9,9 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QDir, Qt, QUrl
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-
-
-root_path = "/Users/haowu/Documents/576/project/query/";
+# from PyQt5.QtChart import QChart, QChartView, QLineSeries
+import AudioAnalysis
+root_path = "/Users/haowu/Documents/576/project/query/"
 dataset_path = "/Users/haowu/Documents/576/project/databse_videos/"
 uiFile = "IRS.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(uiFile)
@@ -23,6 +24,13 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.query_list = self.findQueryFiles()
         self.dataset_list = self.initializeDatasetFiles()
+
+        # self.chart = QChart()
+        #
+        # self.chartView.setChart(self.chart)
+        # self.chart.setTitle("test")
+
+
 
         for name in self.query_list:
             self.cb_query_list.addItem(name[1])
@@ -164,4 +172,15 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainInterface()
     window.show()
+
+    if __name__ == "__main__":
+        # used to test
+        diff = AudioAnalysis.compareSimilarity("/Users/haowu/Documents/576/project/query/first/first.wav")
+
+        f = open('test.txt', 'w')
+
+        for d in diff:
+            f.write(d.name + " : " + str(d.diff))
+        f.close()
+
     sys.exit(app.exec_())
