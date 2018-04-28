@@ -46,26 +46,3 @@ class TestWindow(QMainWindow):
         self.chart.addSeries(curve)
         self.chart.createDefaultAxes()
         self.ncurves += 1
-
-
-if __name__ == '__main__':
-    import sys
-    from PyQt5.QtWidgets import QApplication
-    from PyQt5.QtCore import Qt
-
-    app = QApplication(sys.argv)
-
-    window = TestWindow()
-
-    npoints = 1000000
-    xdata = np.linspace(0., 10., npoints)
-    window.add_data(xdata, np.sin(xdata), color=Qt.red)
-    window.add_data(xdata, np.cos(xdata), color=Qt.blue)
-    window.set_title("Simple example with %d curves of %d points " \
-                     "(OpenGL Accelerated Series)" \
-                     % (window.ncurves, npoints))
-    window.setWindowTitle("Simple performance example")
-    window.show()
-    window.resize(500, 400)
-
-    sys.exit(app.exec_())

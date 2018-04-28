@@ -4,12 +4,14 @@ import os
 import play
 from PyQt5.QtWidgets import (QWidget, QPushButton, QFileDialog, QStyle,
                              QHBoxLayout, QVBoxLayout, QApplication, QFrame, QSplitter, QMainWindow)
-from PyQt5 import uic
+from PyQt5 import uic, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import QDir, Qt, QUrl
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-# from PyQt5.QtChart import QChart, QChartView, QLineSeries
+import pyqtgraph as pg
+import numpy as np
+
 import AudioAnalysis
 root_path = "/Users/haowu/Documents/576/project/query/"
 dataset_path = "/Users/haowu/Documents/576/project/databse_videos/"
@@ -25,10 +27,6 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         self.query_list = self.findQueryFiles()
         self.dataset_list = self.initializeDatasetFiles()
 
-        # self.chart = QChart()
-        #
-        # self.chartView.setChart(self.chart)
-        # self.chart.setTitle("test")
 
 
 
@@ -50,6 +48,7 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         self.lv_dataset.currentItemChanged.connect(self.dataset_list_item_clicked)
         self.hs_dataset_progress.setRange(0,0)
         self.hs_dataset_progress.sliderMoved.connect(self.dataset_setPosition)
+
 
     def findQueryFiles(self):
         query_name_list = []
@@ -104,6 +103,7 @@ class MainInterface(QMainWindow, Ui_MainWindow):
             self.mediaPlayer.setMedia(
                 QMediaContent(QUrl.fromLocalFile(videoFilePath)))
             self.btn_query_play.setEnabled(True)
+            self.setChart(root_path+self.cb_query_list.currentText() + "/",self.cb_query_list.currentText())
 
     def mediaStateChanged(self, state):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -166,21 +166,31 @@ class MainInterface(QMainWindow, Ui_MainWindow):
             QMediaContent(QUrl.fromLocalFile(videoFilePath)))
         self.btn_dataset_play.setEnabled(True)
 
+    def setChart(self,path,name):
+        diff = AudioAnalysis.compareSimilarity(path+"/"+name+".wav")
+
+        sound_data = []
+        category_data = {}
+        for f in diff:
+            sound_data.append(int(f.diff))
+        for i in range(len(self.dataset_list)):
+            category_data[i] = self.dataset_list[i][1]
+        self.chart.setData(category_data,sound_data)
+
+
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainInterface()
     window.show()
-
-    if __name__ == "__main__":
         # used to test
-        diff = AudioAnalysis.compareSimilarity("/Users/haowu/Documents/576/project/query/first/first.wav")
-
-        f = open('test.txt', 'w')
-
-        for d in diff:
-            f.write(d.name + " : " + str(d.diff))
-        f.close()
+    # diff = AudioAnalysis.compareSimilarity("/Users/haowu/Documents/576/project/query/first/first.wav")
+    #
+    # f = open('test.txt', 'w')
+    #
+    # for d in diff:
+    #     f.write(d.name + " : " + str(d.diff))
+    # f.close()
 
     sys.exit(app.exec_())
