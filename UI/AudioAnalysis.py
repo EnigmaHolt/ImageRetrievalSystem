@@ -101,7 +101,13 @@ def calParams(path):
     stdE = np.std(features[1])
     return[mF, th, meanZRC, stdZRC, meanE, stdE]
 
-
+def sortAndgeneCoeff(diff):
+    diff.sort(cmp=None, key=lambda x:x.diff, reverse=False)
+    print len(diff)
+    idx = len(diff)-1
+    max = diff[idx].diff
+    for d in diff:
+        d.diff = (max - d.diff)/max
 
 #calculate diffenrent with the video in databases
 def compareSimilarity(queryPath):
@@ -125,7 +131,8 @@ def compareSimilarity(queryPath):
         totalD = thW*thDiff + meanEDiff*meanEW + meanZDiff*meanZCRW + stdEDiff*stdEW + stdZDiff*stdZCRW + mfW * freqDiff
         cur.diff = totalD
         different.append(cur)
-    different.sort(cmp=None, key=lambda x:x.diff, reverse=False)
+    #different.sort(cmp=None, key=lambda x:x.diff, reverse=False)
+    sortAndgeneCoeff(different)
     return different
 
 
