@@ -90,7 +90,7 @@ class VideoGenerator():
 
         return imageList;
 
-    def generateVideo(self,path,query):
+    def generateVideo(self,path,query,mode):
         # Test Code(Passed on Apr,19th)
-        imL = self.readAllImages(path, 1,query)
+        imL = self.readAllImages(path, mode,query)
         self.convertToVideo(imL, query+"_output.mov")

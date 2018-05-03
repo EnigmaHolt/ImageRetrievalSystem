@@ -87,6 +87,12 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         self.audio_player.stateChanged.connect(self.mediaStateChanged)
         #self.audio_player.play();
 
+    def dataset_setAudio(self,filePath):
+        url = PyQt5.QtCore.QUrl.fromLocalFile(filePath)
+        content = PyQt5.QtMultimedia.QMediaContent(url)
+        self.dataset_audio_player = PyQt5.QtMultimedia.QMediaPlayer()
+        self.dataset_audio_player.setMedia(content)
+        self.dataset_audio_player.stateChanged.connect(self.dataset_mediaStateChanged)
 
 
 
@@ -154,8 +160,10 @@ class MainInterface(QMainWindow, Ui_MainWindow):
     def dateset_play(self):
         if self.dataset_mediaPlayer.state() == QMediaPlayer.PlayingState:
             self.dataset_mediaPlayer.pause()
+            self.dataset_audio_player.pause()
         else:
             self.dataset_mediaPlayer.play()
+            self.dataset_audio_player.play()
 
     def setPosition(self, position):
         self.mediaPlayer.setPosition(position)
@@ -182,7 +190,7 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         if not os.path.isfile(videoFilePath):
             try:
                 video = play.VideoGenerator()
-                video.generateVideo(root_path + self.cb_query_list.currentText() + "/", self.cb_query_list.currentText()+self.prefix)
+                video.generateVideo(root_path + self.cb_query_list.currentText() + "/" ,self.cb_query_list.currentText()+self.prefix,1)
                 checkPathIsAvailable = True
             except:
                 QtGui.QMessageBox.information(self, "Alert", "Wrong File Path")
@@ -211,8 +219,6 @@ class MainInterface(QMainWindow, Ui_MainWindow):
             self.btn_query_play.setIcon(
                 self.style().standardIcon(QStyle.SP_MediaPlay))
 
-
-
     def positionChanged(self, position):
         self.hs_query_progress.setValue(position)
 
@@ -228,7 +234,7 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         # self.errorLabel.setText("Error: " + self.mediaPlayer.errorString())
 
     def dataset_mediaStateChanged(self, state):
-        if self.dataset_mediaPlayer.state() == QMediaPlayer.PlayingState:
+        if self.dataset_mediaPlayer.state() == QMediaPlayer.PlayingState and self.dataset_audio_player.state() == QMediaPlayer.PlayingState:
             self.btn_dataset_play.setIcon(
                 self.style().standardIcon(QStyle.SP_MediaPause))
         else:
@@ -243,6 +249,8 @@ class MainInterface(QMainWindow, Ui_MainWindow):
 
     def dataset_setPosition(self, position):
         self.dataset_mediaPlayer.setPosition(position)
+        self.dataset_audio_player.setPosition(position)
+
 
     def dataset_handleError(self):
         self.btn_dataset_play.setEnabled(False)
@@ -253,16 +261,19 @@ class MainInterface(QMainWindow, Ui_MainWindow):
     def dataset_list_item_clicked(self,current):
         self.selectText = current.text()
         videoFileName = current.text() + "_output.mov"
+        audioFileName = current.text() + ".wav"
         videoFilePath = os.getcwd()+"/" + videoFileName
+        audioFilePath = os.getcwd()+"/"+audioFileName
         if not os.path.isfile(videoFilePath):
             video = play.VideoGenerator()
-            video.generateVideo(dataset_path+current.text()+"/",current.text())
+            video.generateVideo(dataset_path+current.text()+"/",current.text(),0)
         self.dataset_mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.dataset_mediaPlayer.setVideoOutput(self.videoWidget_2)
         self.dataset_mediaPlayer.stateChanged.connect(self.dataset_mediaStateChanged)
         self.dataset_mediaPlayer.positionChanged.connect(self.dataset_positionChanged)
         self.dataset_mediaPlayer.durationChanged.connect(self.dataset_durationChanged)
         self.dataset_mediaPlayer.error.connect(self.dataset_handleError)
+        self.dataset_setAudio(audioFilePath)
 
         self.dataset_mediaPlayer.setMedia(
             QMediaContent(QUrl.fromLocalFile(videoFilePath)))
