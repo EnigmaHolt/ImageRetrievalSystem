@@ -1,16 +1,21 @@
 
 import sys
 import os
+
+import PyQt5
+import operator
+
 import play
 from PyQt5.QtWidgets import (QWidget, QPushButton, QFileDialog, QStyle,
-                             QHBoxLayout, QVBoxLayout, QApplication, QFrame, QSplitter, QMainWindow)
+                             QHBoxLayout, QVBoxLayout, QApplication, QFrame, QSplitter, QMainWindow, QTableWidgetItem)
 from PyQt5 import uic, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtCore import QDir, Qt, QUrl
+from PyQt5.QtCore import QDir, Qt, QUrl, pyqtSlot
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 import pyqtgraph as pg
 import numpy as np
+import imageReaderTest
 
 import AudioAnalysis
 root_path = "/Users/haowu/Documents/576/project/query/"
@@ -27,7 +32,8 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         self.query_list = self.findQueryFiles()
         self.dataset_list = self.initializeDatasetFiles()
 
-
+        self.motionArray = []
+        self.refreshProgressBar(0)
 
 
         for name in self.query_list:
@@ -73,11 +79,77 @@ class MainInterface(QMainWindow, Ui_MainWindow):
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.error.connect(self.handleError)
 
+    def setAudio(self,filePath):
+        url = PyQt5.QtCore.QUrl.fromLocalFile(filePath)
+        content = PyQt5.QtMultimedia.QMediaContent(url)
+        self.audio_player = PyQt5.QtMultimedia.QMediaPlayer()
+        self.audio_player.setMedia(content)
+        self.audio_player.stateChanged.connect(self.mediaStateChanged)
+        #self.audio_player.play();
+
+
+
+
     def play(self):
-        if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
+        if self.mediaPlayer.state() == QMediaPlayer.PlayingState and self.audio_player.state() == QMediaPlayer.PlayingState:
             self.mediaPlayer.pause()
+            self.audio_player.pause()
         else:
             self.mediaPlayer.play()
+            self.audio_player.play()
+
+    def setResult(self):
+
+        self.audio_analysis_result = {}
+        self.color_analysis_result = {}
+        self.motion_analysis_result = {}
+        self.audioArray = {}
+
+        diff = AudioAnalysis.compareSimilarity(root_path + self.cb_query_list.currentText() + "/" + self.cb_query_list.currentText() + ".wav")
+        for f in diff:
+            self.audioArray[f.name[:f.name.index(".")].encode('ascii','ignore').lower()] = f.diff
+            self.audio_analysis_result[f.name[:f.name.index(".")].encode('ascii','ignore').lower()] = "%.2f" % (f.diff*100) +"%"
+
+
+        self.motionArray = imageReaderTest.getMotionSimilarity(root_path + self.cb_query_list.currentText() + "/"+self.cb_query_list.currentText()+self.prefix)
+        self.colorArray = imageReaderTest.getColorSimilarity("/Users/haowu/Documents/576/project/databse_videos",root_path + self.cb_query_list.currentText() + "/"+self.cb_query_list.currentText()+self.prefix)
+
+
+        self.tw_categories.setRowCount(7)
+
+        for item in self.motionArray.iteritems():
+            sum_motion = sum(item[1])/600*100
+            self.motion_analysis_result[item[0].lower()] = "%.2f" % sum_motion+"%"
+
+        for item in self.colorArray.iteritems():
+            sum_color = sum(item[1])/600*100
+            self.color_analysis_result[item[0].lower()] = "%.2f" % sum_color + "%"
+
+        sorted_array = []
+        sorted_dic ={}
+
+        for item in self.audio_analysis_result.iteritems():
+            sum_motion_all = sum(self.motionArray[item[0]])/600*100
+            sum_color_all = sum(self.colorArray[item[0]])/600*100
+            sum_audio = self.audioArray[item[0]] * 100
+            sorted_dic[item[0]] = sum_motion_all *0.3 + sum_color_all * 0.5+ sum_audio*0.2
+
+        sorted_array = sorted(sorted_dic.items(), key=operator.itemgetter(1),reverse=True)
+
+        #sorted(sorted_dic.items(),key=lambda item:item[1],reverse=True)
+        index = 0
+        for item in sorted_array:
+            self.tw_categories.setItem(index, 0, QTableWidgetItem(item[0]))
+            self.tw_categories.setItem(index, 1, QTableWidgetItem(self.motion_analysis_result[item[0]]))
+            self.tw_categories.setItem(index, 2, QTableWidgetItem(self.color_analysis_result[item[0]]))
+            self.tw_categories.setItem(index, 3, QTableWidgetItem(self.audio_analysis_result[item[0]]))
+            self.tw_categories.setItem(index, 4, QTableWidgetItem("%2f"%(sorted_dic[item[0]])+"%"))
+            index += 1
+
+
+
+
+        self.refreshProgressBar(100)
 
     def dateset_play(self):
         if self.dataset_mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -93,25 +165,53 @@ class MainInterface(QMainWindow, Ui_MainWindow):
 
     def openFile(self):
 
-        videoFileName = self.cb_query_list.currentText() + "_output.mov"
+        self.prefix = ""
+        if self.rb_is_new_query.isChecked():
+            self.prefix = "_"
+
+        audioFileName = self.cb_query_list.currentText()+".wav"
+        audioFilePath = root_path+self.cb_query_list.currentText()+"/"+audioFileName
+
+
+
+        videoFileName = self.cb_query_list.currentText()+self.prefix + "_output.mov"
         videoFilePath = os.getcwd()+"/" + videoFileName
+
+        self.refreshProgressBar(10)
+        checkPathIsAvailable = False
         if not os.path.isfile(videoFilePath):
-            video = play.VideoGenerator();
-            video.generateVideo(root_path + self.cb_query_list.currentText() + "/", self.cb_query_list.currentText())
-        self.setVideo()
-        if videoFilePath != '':
-            self.mediaPlayer.setMedia(
-                QMediaContent(QUrl.fromLocalFile(videoFilePath)))
-            self.btn_query_play.setEnabled(True)
-            self.setChart(root_path+self.cb_query_list.currentText() + "/",self.cb_query_list.currentText())
+            try:
+                video = play.VideoGenerator()
+                video.generateVideo(root_path + self.cb_query_list.currentText() + "/", self.cb_query_list.currentText()+self.prefix)
+                checkPathIsAvailable = True
+            except:
+                QtGui.QMessageBox.information(self, "Alert", "Wrong File Path")
+        else:
+            checkPathIsAvailable = True
+        if checkPathIsAvailable:
+            self.refreshProgressBar(30)
+            self.setVideo()
+
+            self.setAudio(audioFilePath)
+
+            self.setResult()
+
+
+            if videoFilePath != '':
+                self.mediaPlayer.setMedia(
+                    QMediaContent(QUrl.fromLocalFile(videoFilePath)))
+                self.btn_query_play.setEnabled(True)
+
 
     def mediaStateChanged(self, state):
-        if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
+        if self.mediaPlayer.state() == QMediaPlayer.PlayingState and self.audio_player.state() == QMediaPlayer.PlayingState:
             self.btn_query_play.setIcon(
                 self.style().standardIcon(QStyle.SP_MediaPause))
         else:
             self.btn_query_play.setIcon(
                 self.style().standardIcon(QStyle.SP_MediaPlay))
+
+
 
     def positionChanged(self, position):
         self.hs_query_progress.setValue(position)
@@ -121,6 +221,7 @@ class MainInterface(QMainWindow, Ui_MainWindow):
 
     def setPosition(self, position):
         self.mediaPlayer.setPosition(position)
+        self.audio_player.setPosition(position)
 
     def handleError(self):
         self.btn_query_play.setEnabled(False)
@@ -150,6 +251,7 @@ class MainInterface(QMainWindow, Ui_MainWindow):
 
 
     def dataset_list_item_clicked(self,current):
+        self.selectText = current.text()
         videoFileName = current.text() + "_output.mov"
         videoFilePath = os.getcwd()+"/" + videoFileName
         if not os.path.isfile(videoFilePath):
@@ -166,17 +268,21 @@ class MainInterface(QMainWindow, Ui_MainWindow):
             QMediaContent(QUrl.fromLocalFile(videoFilePath)))
         self.btn_dataset_play.setEnabled(True)
 
-    def setChart(self,path,name):
-        diff = AudioAnalysis.compareSimilarity(path+"/"+name+".wav")
+        if len(self.motionArray)>0:
+            self.setChart()
 
-        sound_data = []
+
+    def setChart(self):
         category_data = {}
-        for f in diff:
-            sound_data.append(int(f.diff))
-        for i in range(len(self.dataset_list)):
-            category_data[i] = self.dataset_list[i][1]
-        self.chart.setData(category_data,sound_data)
+        motionData = self.motionArray[self.selectText.encode('ascii','ignore').lower()]
+        colorData = self.colorArray[self.selectText.encode('ascii','ignore').lower()]
+        for i in range(len(motionData)):
+            category_data[i] = str(i)
+        self.chart.setData(category_data,motionData,colorData,50)
 
+    def refreshProgressBar(self,value):
+        self.pb_process.setValue(value)
+        app.processEvents()
 
 
 
@@ -184,13 +290,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainInterface()
     window.show()
-        # used to test
-    # diff = AudioAnalysis.compareSimilarity("/Users/haowu/Documents/576/project/query/first/first.wav")
-    #
-    # f = open('test.txt', 'w')
-    #
-    # for d in diff:
-    #     f.write(d.name + " : " + str(d.diff))
-    # f.close()
 
     sys.exit(app.exec_())

@@ -4,6 +4,8 @@ import cv2
 import json
 import math
 import sys
+
+import os
 from matplotlib import pyplot as plt
 from PIL import Image
 from decimal import Decimal
@@ -12,7 +14,7 @@ def readImage(path):
     photo = open(path).read()
     source = bytearray()
     source.extend(photo)
-    w, h = 352, 288;
+    w, h = 352, 288
 
     rMatrix = [[0 for x in range(w)] for y in range(h)]
     gMatrix = [[0 for x in range(w)] for y in range(h)]
@@ -34,13 +36,13 @@ def readImage(path):
 
     #Merge three channels and display!
     im = cv2.merge((b, g, r))       
-    return im;
+    return im
 
 # If user wants to display a specific image, use this method.
 def displayImage(image, time, message):
     cv2.imshow(message, image)
     cv2.waitKey(time)        
-    return;
+    return
 
 # Calculate the overall color similarity in a group of frames.
 def calGroupColorSimilarty(queryList, dataList, startQ, startD, sub):
@@ -56,7 +58,7 @@ def calGroupColorSimilarty(queryList, dataList, startQ, startD, sub):
         result = result / sampleCount
     else:
         result = 0.0
-    return result;
+    return result
 
 # Range of similarity is 0-1. 1 means two are the same pictures.
 def colorSimilarity(image1, image2):
@@ -68,15 +70,16 @@ def colorSimilarity(image1, image2):
     hist6 = cv2.calcHist([image2], [2], None, [256], [0, 256])
     result = cv2.compareHist(hist1, hist2, cv2.HISTCMP_CORREL) + cv2.compareHist(hist3, hist4, cv2.HISTCMP_CORREL) +cv2.compareHist(hist5, hist6, cv2.HISTCMP_CORREL)
     result = result / 3.0
-    return result;
+    return result
 
 # Given a list of images in OpenCV format, convert them into a 30 fps video into a specified path.
 def convertToVideo(imageList, path):
-    out = cv2.VideoWriter(path, -1, 30.0, (352, 288))
-    for image in imageList:
-        out.write(image)
-    out.release()
-    return;
+    if not os.path.exists(path):
+        out = cv2.VideoWriter(path, -1, 30.0, (352, 288))
+        for image in imageList:
+            out.write(image)
+        out.release()
+    return
 
 # Given a path, read all images in that path. Mode-0 means Database Videos including 600 frames, Mode-1 means 150-frame Query Video. 
 def readAllImages(path, mode, sub):
@@ -255,7 +258,7 @@ def getMotionSimilarity(path):
     imL = readAllImages(path, 1, 1)
     clipResult = convertSegmentsAndAnalysis(detectKeyFrame(imL), imL, path)
     result["musicvideo"] = compareSingleClip(clipResult, json.load(open('dataVideo.json'))["musicvideo"])
-    result["starCraft"] = compareSingleClip(clipResult, json.load(open('dataVideo.json'))["starCraft"])
+    result["starcraft"] = compareSingleClip(clipResult, json.load(open('dataVideo.json'))["starCraft"])
     result["movie"] = compareSingleClip(clipResult, json.load(open('dataVideo.json'))["movie"])
     result["interview"] = compareSingleClip(clipResult, json.load(open('dataVideo.json'))["interview"])
     result["flowers"] = compareSingleClip(clipResult, json.load(open('dataVideo.json'))["flowers"])
@@ -324,10 +327,9 @@ def getColorSimilarity(dataVideoFolder, queryPath):
     result["flowers"] = compareSingleColor(imR, imL)
     #print(sum(result["flowers"]))
     imL = readAllImages(dataVideoFolder + "/musicvideo/musicvideo", 0, 8)
-    #result["musicvideo"] = compareSingleColor(imR, imL)
-    print(sum(result["musicvideo"]))
-    imL = readAllImages(dataVideoFolder + "/starcraft/starCraft", 0, 8)
-    result["starCraft"] = compareSingleColor(imR, imL)
+    result["musicvideo"] = compareSingleColor(imR, imL)
+    imL = readAllImages(dataVideoFolder + "/starcraft/StarCraft", 0, 8)
+    result["starcraft"] = compareSingleColor(imR, imL)
     #print(sum(result["starCraft"]))
     imL = readAllImages(dataVideoFolder + "/movie/movie", 0, 8)
     result["movie"] = compareSingleColor(imR, imL)
@@ -344,9 +346,9 @@ def getColorSimilarity(dataVideoFolder, queryPath):
     return result;
 
 # The parameter is the path of query video! WATCH the _ after Q4!!!
-getMotionSimilarity("/Users/leichen/Desktop/Q4/Q4_")
+#getMotionSimilarity("/Users/leichen/Desktop/Q4/Q4_")
 
 # The first param is the FOLDER you store ALL database videos! 
 # The second is the path of query video, WATCH the _ after HQ1!!!
-getColorSimilarity("/Users/leichen/Desktop", "/Users/leichen/Desktop/HQ2/HQ2_")
+#getColorSimilarity("/Users/leichen/Desktop", "/Users/leichen/Desktop/HQ2/HQ2_")
 

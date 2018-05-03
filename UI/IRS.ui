@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1288</width>
-    <height>688</height>
+    <width>1289</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>1231</width>
+     <width>1201</width>
      <height>341</height>
     </rect>
    </property>
@@ -43,25 +43,12 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QPushButton" name="btn_query_process">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>270</y>
-         <width>131</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Process</string>
-       </property>
-      </widget>
       <widget class="QSlider" name="hs_query_progress">
        <property name="geometry">
         <rect>
-         <x>90</x>
-         <y>220</y>
-         <width>281</width>
+         <x>100</x>
+         <y>270</y>
+         <width>411</width>
          <height>22</height>
         </rect>
        </property>
@@ -73,33 +60,20 @@
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>210</y>
-         <width>41</width>
-         <height>41</height>
+         <y>260</y>
+         <width>51</width>
+         <height>51</height>
         </rect>
        </property>
        <property name="text">
         <string>Go</string>
        </property>
       </widget>
-      <widget class="Line" name="line">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>250</y>
-         <width>391</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>10</y>
+         <x>250</x>
+         <y>0</y>
          <width>60</width>
          <height>16</height>
         </rect>
@@ -112,48 +86,31 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>30</y>
-         <width>391</width>
-         <height>16</height>
+         <y>10</y>
+         <width>581</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QComboBox" name="cb_query_list">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>270</y>
-         <width>104</width>
-         <height>41</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QVideoWidget" name="videoWidget" native="true">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>40</y>
-         <width>361</width>
-         <height>161</height>
+         <x>10</x>
+         <y>30</y>
+         <width>561</width>
+         <height>221</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_4">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>280</y>
-         <width>71</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Query List:</string>
-       </property>
-      </widget>
+      <zorder>hs_query_progress</zorder>
+      <zorder>btn_query_play</zorder>
+      <zorder>label</zorder>
+      <zorder>line_2</zorder>
+      <zorder>videoWidget</zorder>
+      <zorder>frame_2</zorder>
      </widget>
     </item>
     <item>
@@ -167,8 +124,8 @@
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
-         <x>140</x>
-         <y>10</y>
+         <x>220</x>
+         <y>0</y>
          <width>131</width>
          <height>16</height>
         </rect>
@@ -181,8 +138,8 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>30</y>
-         <width>391</width>
+         <y>10</y>
+         <width>581</width>
          <height>16</height>
         </rect>
        </property>
@@ -208,7 +165,7 @@
         <rect>
          <x>100</x>
          <y>270</y>
-         <width>261</width>
+         <width>311</width>
          <height>22</height>
         </rect>
        </property>
@@ -219,39 +176,23 @@
       <widget class="QVideoWidget" name="videoWidget_2" native="true">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>50</y>
-         <width>361</width>
-         <height>191</height>
+         <x>10</x>
+         <y>30</y>
+         <width>411</width>
+         <height>211</height>
         </rect>
        </property>
-       <zorder>frame_3</zorder>
       </widget>
-     </widget>
-    </item>
-    <item>
-     <widget class="QFrame" name="frame">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="lineWidth">
-       <number>1</number>
-      </property>
       <widget class="QListWidget" name="lv_dataset">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>191</width>
-         <height>301</height>
+         <x>440</x>
+         <y>30</y>
+         <width>121</width>
+         <height>271</height>
         </rect>
        </property>
       </widget>
-      <zorder>lv_dataset</zorder>
-      <zorder>frame_2</zorder>
      </widget>
     </item>
    </layout>
@@ -259,10 +200,10 @@
   <widget class="QFrame" name="frame_4">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>360</y>
+     <x>30</x>
+     <y>390</y>
      <width>781</width>
-     <height>321</height>
+     <height>271</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -278,7 +219,7 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>10</y>
+      <y>0</y>
       <width>131</width>
       <height>16</height>
      </rect>
@@ -291,7 +232,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>30</y>
+      <y>10</y>
       <width>781</width>
       <height>16</height>
      </rect>
@@ -303,12 +244,128 @@
    <widget class="CustomWidget" name="chart" native="true">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>60</y>
-      <width>741</width>
-      <height>241</height>
+      <x>10</x>
+      <y>30</y>
+      <width>761</width>
+      <height>231</height>
      </rect>
     </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="btn_query_process">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>350</y>
+     <width>131</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Process</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cb_query_list">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>350</y>
+     <width>104</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>360</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Query List:</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="rb_is_new_query">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>360</y>
+     <width>100</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>is new query</string>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="pb_process">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>360</y>
+     <width>118</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>24</number>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>350</y>
+     <width>383</width>
+     <height>321</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
+   <widget class="QTableWidget" name="tw_categories">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>361</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string>category name</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>motion score</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>color score</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>audio score</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>total score</string>
+     </property>
+    </column>
    </widget>
   </widget>
  </widget>
